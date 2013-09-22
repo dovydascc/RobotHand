@@ -15,10 +15,11 @@ public class RobotHand {
         	serialPort.openPort();
         	serialPort.setParams(115200, 8, 1, 0); // Nustatymai: Baudrate 115200; Databits – 8; Stopbits - 1; Parity – none; 
         }
-        catch (SerialPortException e){
+        catch (SerialPortException e) {
             System.out.println(e);
         }
-        engines = initEngines();
+        sendCommand(5, 2500);
+        //engines = initEngines();
 	}
 	
 	
@@ -28,7 +29,7 @@ public class RobotHand {
 		Engine[] engines = new Engine[6];
 		//Nustatymai Engine(RobotHand rh, int engineNo, boolean isPositional, double speed, int idlePulse, int minPulse, int maxPulse, long sleepTime)
 		engines[0] = new Engine(this, 0, false, 2, 1470, 1440, 1500, 150);
-		engines[1] = new Engine(this, 1, false, 4, 1500, 1400, 1540, 50);
+		engines[1] = new Engine(this, 1, false, 6, 1500, 1400, 1540, 50);
 		engines[2] = new Engine(this, 2, false, 500, 1500, 1200, 2500, 500);
 		engines[3] = new Engine(this, 3, false, 2, 1500, 1450, 1550, 150);
 		engines[4] = new Engine(this, 4, true, 0.05, 1500, 500, 2500, 150);
