@@ -1,36 +1,66 @@
 package main;
 
-import java.awt.Button;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Main extends JFrame {
+@SuppressWarnings("serial")
+public class Main extends JPanel implements ActionListener 
+{
 
 	static RobotHand rh;
+	static final String PORT = "COM14"; // nurodyti portà
 	
-    public static void main(String[] args) {
-    	Main m = new Main();
-    	m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    	m.pack();
-    	m.setVisible(true);
-    	m.attachShutDownHook();
-    	m.setSize(600, 600);
-    	
-    	rh = new RobotHand("COM14"); // Nurodyk savo portà.
-    	MouseInput mi = new MouseInput(rh);
+	static Main main;
+	static MouseInput mouseInput;
+	
+	static boolean isButtonPressed = false;
+	
+    public static void main(String[] args) 
+    {
+    	main = new Main();
  
-    	m.addMouseMotionListener(mi);
-    	m.addMouseListener(mi);
-    	m.addMouseWheelListener(mi);
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+        main.attachShutDownHook();
     }   
+    
+    
+    
+    private static void createAndShowGUI() 
+    {
+        JFrame frame = new JFrame("Robotinë Ranka");
+        main.setOpaque(true);
+        frame.setContentPane(main);
+        main.setLayout(new GridBagLayout());
+
+        JButton button = new JButton("Ájungti");
+        main.add(button);
+        button.addActionListener(main);
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(600, 600));
+        
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
     
     
     /*
      * Metodas iðjungia variklius, uþdaro portus, kai uþdaroma programa
      */
-    public void attachShutDownHook(){
+    public void attachShutDownHook() 
+    {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
@@ -40,4 +70,25 @@ public class Main extends JFrame {
 			}
 		});
     }
+
+    
+    
+	@Override
+	public void actionPerformed(ActionEvent e) 
+	{
+		if ( !isButtonPressed) {
+			rh = new RobotHand(PORT); 
+	    	mouseInput = new MouseInput(rh);
+	    	main.addMouseMotionListener(mouseInput);
+	    	main.addMouseListener(mouseInput);
+	    	main.addMouseWheelListener(mouseInput);
+	    	isButtonPressed = true;
+		} else {
+			main.removeMouseMotionListener(mouseInput);
+	    	main.removeMouseListener(mouseInput);
+	    	main.removeMouseWheelListener(mouseInput);
+	    	rh.shutdown();
+	    	isButtonPressed = false;
+		}
+	}
 }

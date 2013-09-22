@@ -5,57 +5,44 @@ import jssc.SerialPortException;
 
 public class RobotHand {
 	private SerialPort serialPort;
+		
+	Engine[] engines;
 	
-	private static final int[][] PULSES_INTERVALS = new int[][]{ // varikliø impulsø min ir maks ribos, individualiai varikliui
-		{ 500, 2500 }, { 500, 2500 }, { 500, 2500 }, { 500, 2500 }, { 500, 2500 }, { 1000, 2500 } 
-	};
-	
-	private static final double[] SPEEDS = new double[] {1.0, 1.0, 1.0, 1.0, 0.5, 50.0};
-
-	private int[] pulses = new int[] {
-			1500,
-			1500,
-			1500,
-			1500,
-			1500,
-			1500
-	};
-	
-	public static enum GripAction {PRESS, STOP, RELEASE}; // griebtuvo veiksmas
-	private GripAction gripAction = GripAction.STOP;
-
-	Thread gripEngineThread;
-	boolean shouldGripEngineThreadRun = true;
-	
-	
-	
-	public RobotHand(String commPort) {
+	public RobotHand(String commPort) 
+	{
 		serialPort = new SerialPort(commPort);
         try {
-        	/* 
-        	 * Nustatymai: 
-        	 * Baudrate 115200;
-			 * Parity – none;
-			 * Databits – 8;
-			 * Stopbits - 1
-        	 */
         	serialPort.openPort();
-        	serialPort.setParams(115200, 8, 1, 0);
+        	serialPort.setParams(115200, 8, 1, 0); // Nustatymai: Baudrate 115200; Databits – 8; Stopbits - 1; Parity – none; 
         }
         catch (SerialPortException e){
             System.out.println(e);
         }
-        readEnginesPositions();
-        createGripEngineThread();
-        gripEngineThread.start();
+        engines = initEngines();
 	}
 	
-	public void move(int engineNo, double pulseChange) {
-		pulses[engineNo] = fitInInterval(engineNo, (int) (pulses[engineNo] + (pulseChange * SPEEDS[engineNo])));
-		sendCommand(engineNo, pulses[engineNo]);
+	
+	
+	public Engine[] initEngines() 
+	{
+		Engine[] engines = new Engine[6];
+		//Nustatymai Engine(RobotHand rh, int engineNo, boolean isPositional, double speed, int idlePulse, int minPulse, int maxPulse, long sleepTime)
+		engines[0] = new Engine(this, 0, false, 2, 1470, 1440, 1500, 150);
+		engines[1] = new Engine(this, 1, false, 4, 1500, 1400, 1540, 50);
+		engines[2] = new Engine(this, 2, false, 500, 1500, 1200, 2500, 500);
+		engines[3] = new Engine(this, 3, false, 2, 1500, 1450, 1550, 150);
+		engines[4] = new Engine(this, 4, true, 0.05, 1500, 500, 2500, 150);
+		engines[5] = new Engine(this, 5, true, 50, 1500, 1000, 2500, 20);
+		for (Engine e: engines) {
+			e.start();
+		}
+		return engines;
 	}
-
-	private void sendCommand(int engineNo, int p) {
+	
+	
+	
+	public synchronized void sendCommand(int engineNo, int p) 
+	{
 		log(engineNo, p);
 		String command = "#" + engineNo + "P" + p + "\r";
 		try {
@@ -65,21 +52,26 @@ public class RobotHand {
 		}
 	}
 	
-	public void setGripAction(GripAction gripAction) {
-		this.gripAction = gripAction;
+	
+	
+	public void move(int engineNo, double change) 
+	{
+		engines[engineNo].move(change);
 	}
 	
-	public void stopEngine(int i) {
-		sendCommand(i, 0);
-	}
 	
-	public void stopEngines() {
+	
+	public void stopEngines() 
+	{
 		for (int i = 0; i < 6; i++) {
 			sendCommand(i, 0);
 		}
 	}
 	
-	public void closePort() {
+	
+	
+	public void closePort() 
+	{
 		try {
 			serialPort.closePort();
 		} catch (SerialPortException e) {
@@ -87,59 +79,26 @@ public class RobotHand {
 		}
 	}
 	
-	public void shutdown() {
-		shouldGripEngineThreadRun = false;
-		try {
-			gripEngineThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+	
+	
+	public void shutdown() 
+	{
+		for (Engine e: engines) {
+			e.setShouldThreadBeOn(false);
+			try {
+				e.join();
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
 		}
 		stopEngines();
 		closePort();
 	}
 	
-	private void readEnginesPositions() {
-//		
-//		try {
-//			String command = "QP 0 1 2 3 4 5\r";
-//			serialPort.writeBytes(command.getBytes());
-//			String varikliai = serialPort.readString();
-//			System.out.println("Nuskaitytos Roboto pozicijos" + varikliai);
-//		} catch (SerialPortException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	}
 	
-	private void createGripEngineThread() {
-        gripEngineThread = new Thread() {
-            public void run() {
-            	while (shouldGripEngineThreadRun) {
-            		System.out.println("Veikia");
-	            	if (gripAction == GripAction.PRESS) {
-	            		move(5, 1);
-	            	} else if (gripAction == GripAction.RELEASE) {
-	            		move(5, -1);
-	            	}
-	            	
-	            	try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-            	}
-            }
-        };
-	}
 	
-	private int fitInInterval(int engineNo, int pulse) {
-	    pulse = (pulse >= PULSES_INTERVALS[engineNo][0]) ? pulse : PULSES_INTERVALS[engineNo][0];
-	    pulse = (pulse <= PULSES_INTERVALS[engineNo][1]) ? pulse : PULSES_INTERVALS[engineNo][1];
-		return pulse;
-	}
-	
-	private void log(int engineNo, int pulse) {
+	private void log(int engineNo, int pulse) 
+	{
 		String[] pulses = new String[6];
 		for (int i = 0; i < 6; i++) {
 			pulses[i] = "-";
