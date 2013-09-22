@@ -18,8 +18,7 @@ public class RobotHand {
         catch (SerialPortException e) {
             System.out.println(e);
         }
-        sendCommand(5, 2500);
-        //engines = initEngines();
+        engines = initEngines();
 	}
 	
 	
