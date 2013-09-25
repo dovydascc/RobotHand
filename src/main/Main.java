@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -18,7 +19,7 @@ public class Main extends JPanel implements ActionListener
 {
 
 	static RobotHand rh;
-	static final String PORT = "COM14"; // nurodyti portà
+	static final String PORT = "COM5"; // nurodyti portà
 	
 	static Main main;
 	static MouseInput mouseInput;
@@ -49,7 +50,8 @@ public class Main extends JPanel implements ActionListener
 
         JButton button = new JButton("Ájungti");
         main.add(button);
-        button.addActionListener(main);
+        button.addActionListener(main); 
+        button.addKeyListener(new KeyListener());
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(600, 600));
@@ -97,4 +99,17 @@ public class Main extends JPanel implements ActionListener
 	    	isButtonPressed = false;
 		}
 	}
+	
+	static class KeyListener extends KeyAdapter {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_R) {
+                rh.record();
+            }
+            
+            if (e.getKeyCode() == KeyEvent.VK_P) {
+                rh.playback();
+            }
+        }
+    }
 }

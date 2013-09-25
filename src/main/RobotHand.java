@@ -1,5 +1,9 @@
 package main;
 
+import java.awt.List;
+import java.util.Date;
+import java.util.LinkedList;
+
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
@@ -7,6 +11,10 @@ public class RobotHand {
 	private SerialPort serialPort;
 		
 	Engine[] engines;
+	LinkedList<String> commands = new LinkedList<String>(); 
+	boolean isRecording = true;
+	boolean isPlaybacking = false;
+	long time = 0;
 	
 	public RobotHand(String commPort) 
 	{
@@ -46,7 +54,21 @@ public class RobotHand {
 		log(engineNo, p);
 		String command = "#" + engineNo + "P" + p + "\r";
 		try {
-			serialPort.writeBytes(command.getBytes());
+			if(isRecording){
+				serialPort.writeBytes(command.getBytes());
+				recordCommand(command);	
+				long current = System.currentTimeMillis() % 1000;
+				//String commanda = Integer.toString(current - time);
+				recordCommand(command);
+				time = current;
+			}else{
+				serialPort.writeBytes(command.getBytes());
+			}
+			/*if(isPlaybacking){
+				for (String recordedCommand : commands) {
+					serialPort.writeBytes(recordedCommand.getBytes());
+				}
+			}*/
 		} catch (SerialPortException e) {
 			System.out.println(e);
 		}
@@ -95,6 +117,23 @@ public class RobotHand {
 		closePort();
 	}
 	
+	public void record(){
+		if(isRecording){
+			isRecording = false;
+		}else{
+			commands = new LinkedList<String>(); 
+			isRecording = true;
+		}
+	}
+	
+	public void playback(){
+		if(isPlaybacking){
+			isPlaybacking = false;
+		}else{
+			isPlaybacking = true;
+		}
+	}
+	
 	
 	
 	private void log(int engineNo, int pulse) 
@@ -105,5 +144,10 @@ public class RobotHand {
 		}
 		pulses[engineNo] = Integer.toString(pulse);
 		System.out.format("P0= %7s P1= %7s P2= %7s P3= %7s P4= %7s P5= %7s\n", (Object[]) pulses);
+	}
+	
+	private void recordCommand(String command)
+	{		
+		commands.add(command);	
 	}
 }
