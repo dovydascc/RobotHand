@@ -1,19 +1,24 @@
 package main;
 
+import java.util.ResourceBundle;
+
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
 public class RobotHand {
+	
+	private static final ResourceBundle mainConfigs = ResourceBundle.getBundle("MainConfigsBundle");
 	private SerialPort serialPort;
 		
 	Engine[] engines;
 	
-	public RobotHand(String commPort) 
+	public RobotHand() 
 	{
-		serialPort = new SerialPort(commPort);
+		serialPort = new SerialPort(mainConfigs.getString("port"));
         try {
         	serialPort.openPort();
-        	serialPort.setParams(115200, 8, 1, 0); // Nustatymai: Baudrate 115200; Databits – 8; Stopbits - 1; Parity – none; 
+        	serialPort.setParams(Integer.parseInt(mainConfigs.getString("baudrate")), Integer.parseInt(mainConfigs.getString("databits")), 
+        			Integer.parseInt(mainConfigs.getString("stopbits")), Integer.parseInt(mainConfigs.getString("parity"))); 
         }
         catch (SerialPortException e) {
             System.out.println(e);

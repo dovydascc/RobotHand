@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -13,12 +14,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import config.MainConfigsBundle;
+
 @SuppressWarnings("serial")
 public class Main extends JPanel implements ActionListener
 {
-
-	static RobotHand rh;
-	static final String PORT = "COM14"; // nurodyti portà
+	static RobotHand robotHand;
 	
 	static Main main;
 	static MouseInput mouseInput;
@@ -69,7 +70,7 @@ public class Main extends JPanel implements ActionListener
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				rh.shutdown();
+				robotHand.shutdown();
 				System.out.println("Robotas iðjungtas");
 				System.exit(0);
 			}
@@ -82,8 +83,9 @@ public class Main extends JPanel implements ActionListener
 	public void actionPerformed(ActionEvent e) 
 	{
 		if ( !isButtonPressed) {
-			rh = new RobotHand(PORT); 
-	    	mouseInput = new MouseInput(rh);
+			robotHand = new RobotHand();
+			
+	    	mouseInput = new MouseInput(robotHand);
 	    	main.addMouseMotionListener(mouseInput);
 	    	main.addMouseListener(mouseInput);
 	    	main.addMouseWheelListener(mouseInput);
@@ -92,7 +94,7 @@ public class Main extends JPanel implements ActionListener
 			main.removeMouseMotionListener(mouseInput);
 	    	main.removeMouseListener(mouseInput);
 	    	main.removeMouseWheelListener(mouseInput);
-	    	rh.shutdown();
+	    	robotHand.shutdown();
 	    	System.out.println("Robotas iðjungtas");
 	    	isButtonPressed = false;
 		}
