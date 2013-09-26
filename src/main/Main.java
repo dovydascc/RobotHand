@@ -14,7 +14,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import config.MainConfigsBundle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import configs.MainConfigsBundle;
 
 @SuppressWarnings("serial")
 public class Main extends JPanel implements ActionListener
@@ -71,7 +74,6 @@ public class Main extends JPanel implements ActionListener
 			@Override
 			public void run() {
 				robotHand.shutdown();
-				System.out.println("Robotas iðjungtas");
 				System.exit(0);
 			}
 		});
@@ -95,7 +97,6 @@ public class Main extends JPanel implements ActionListener
 	    	main.removeMouseListener(mouseInput);
 	    	main.removeMouseWheelListener(mouseInput);
 	    	robotHand.shutdown();
-	    	System.out.println("Robotas iðjungtas");
 	    	isButtonPressed = false;
 		}
 	}

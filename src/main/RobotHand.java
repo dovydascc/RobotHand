@@ -1,13 +1,16 @@
 package main;
 
-import java.util.ResourceBundle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import configs.MainConfigsBundle;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
 public class RobotHand {
-	
-	private static final ResourceBundle mainConfigs = ResourceBundle.getBundle("MainConfigsBundle");
+	private static Logger logger = LogManager.getLogger("RobotHand");
+	 
+	private static final MainConfigsBundle mainConfigs = new MainConfigsBundle();
 	private SerialPort serialPort;
 		
 	Engine[] engines;
@@ -21,7 +24,7 @@ public class RobotHand {
         			Integer.parseInt(mainConfigs.getString("stopbits")), Integer.parseInt(mainConfigs.getString("parity"))); 
         }
         catch (SerialPortException e) {
-            System.out.println(e);
+            logger.error(e);
         }
         engines = initEngines();
 	}
@@ -53,7 +56,7 @@ public class RobotHand {
 		try {
 			serialPort.writeBytes(command.getBytes());
 		} catch (SerialPortException e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 	}
 	
@@ -80,7 +83,7 @@ public class RobotHand {
 		try {
 			serialPort.closePort();
 		} catch (SerialPortException e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 	}
 	
@@ -98,6 +101,7 @@ public class RobotHand {
 		}
 		stopEngines();
 		closePort();
+		logger.info("Robotas iðjungtas");
 	}
 	
 	
@@ -109,6 +113,6 @@ public class RobotHand {
 			pulses[i] = "-";
 		}
 		pulses[engineNo] = Integer.toString(pulse);
-		System.out.format("P0= %7s P1= %7s P2= %7s P3= %7s P4= %7s P5= %7s\n", (Object[]) pulses);
+		logger.info("P0= %7s P1= %7s P2= %7s P3= %7s P4= %7s P5= %7s\n", (Object[]) pulses);
 	}
 }
