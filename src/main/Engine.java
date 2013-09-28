@@ -3,23 +3,25 @@ package main;
 public class Engine extends Thread 
 {
 	RobotHand rh;
-	int engineNo;
-	volatile int pulse = 1500; // varikliui paduodamas impulsas
+	int portNo;
 	boolean isPositional; // ar variklis pozicinis ar greièio?
 	double speed; // impulso kitimo greièio koeficientas
 	int idlePulse; // impulso dydis, prie kurio variklis nejuda
 	int minPulse; // impulso apatinë riba. Skirta riboti greièiui
 	int maxPulse; // impulso virðutinë riba. Skirta riboti greièiui
 	long sleepTime; // gijos miego laikas. Reguliuoja variklio reakijos laikà / daþná
-	boolean shouldThreadBeOn = true; // valdo pagrindiná gijos ciklà
-	double prevChange; // anksèiau gautas judesio pokytis
+	
+	
+	private boolean shouldThreadBeOn = true; // valdo pagrindiná gijos ciklà
+	private double prevChange; // anksèiau gautas judesio pokytis
+	private volatile int pulse; // varikliui paduodamas impulsas
 	
 	
 	
-	public Engine(RobotHand rh, int engineNo, boolean isPositional, double speed, int idlePulse, int minPulse, int maxPulse, long sleepTime) 
+	public Engine(RobotHand rh, int portNo, boolean isPositional, double speed, int idlePulse, int minPulse, int maxPulse, long sleepTime) 
 	{
 		this.rh = rh;
-		this.engineNo = engineNo;
+		this.portNo = portNo;
 		this.pulse = idlePulse;
 		this.isPositional = isPositional;
 		this.speed = speed;
@@ -45,7 +47,7 @@ public class Engine extends Thread
 	
 	public void stopEngine()
 	{
-		rh.sendCommand(engineNo, 0);
+		rh.sendCommand(portNo, 0);
 	}
 	
 	
@@ -64,12 +66,12 @@ public class Engine extends Thread
 	{	
 		while (shouldThreadBeOn) {
 			if (isPositional) {
-				rh.sendCommand(engineNo, pulse);
-				if (engineNo == 5) { // griebtuvas
+				rh.sendCommand(portNo, pulse);
+				if (portNo == 5) { // griebtuvas
 					pulse = fitInInterval( (int) (pulse + speed * prevChange)); // griebtuvui impulsà didinam èia, nes jam nëra pelës koord pokyèiø
 				}
 			} else { // greièio variklis
-				rh.sendCommand(engineNo, pulse);
+				rh.sendCommand(portNo, pulse);
 				pulse = idlePulse;
 			}
 			try {

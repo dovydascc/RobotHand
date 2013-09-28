@@ -14,35 +14,23 @@ public class EnginesConfigsBundle extends ListResourceBundle
     private Object[][] contents = {
     		
     		// varikliø nustatymai
-            { 10, new Object[][] { // pino numeris prie kurio prijungtas variklis
-            		{"isPositional", false}, {"speed", 2.0}, {"idlePulse", 1470}, 
-            		{"minPulse", 1440}, {"maxPulse", 1500}, {"inactivityTimeMillisec", 150},
-            	} 
-            },
-            { 11, new Object[][] { // pino numeris prie kurio prijungtas variklis
-            		{"isPositional", false}, {"speed", 6.0}, {"idlePulse", 1500}, 
-            		{"minPulse", 1400}, {"maxPulse", 1540}, {"inactivityTimeMillisec", 50},
-            	} 
-            },
-            { 12, new Object[][] { // pino numeris prie kurio prijungtas variklis
-            		{"isPositional", false}, {"speed", 500.0}, {"idlePulse", 1500}, 
-            		{"minPulse", 1200}, {"maxPulse", 2500}, {"inactivityTimeMillisec", 500},
-            	} 
-            },
-            { 13, new Object[][] { // pino numeris prie kurio prijungtas variklis
-            		{"isPositional", false}, {"speed", 2.0}, {"idlePulse", 1500}, 
-            		{"minPulse", 1450}, {"maxPulse", 1550}, {"inactivityTimeMillisec", 150},
-            	} 
-            },
-            { 14, new Object[][] { // pino numeris prie kurio prijungtas variklis
-            		{"isPositional", true}, {"speed", 0.05}, {"idlePulse", 1500}, 
-            		{"minPulse", 500}, {"maxPulse", 2500}, {"inactivityTimeMillisec", 150},
-            	} 
-            },            
-            { 15, new Object[][] { // pino numeris prie kurio prijungtas variklis
-            		{"isPositional", true}, {"speed", 50.0}, {"idlePulse", 1500}, 
-            		{"minPulse", 1000}, {"maxPulse", 2500}, {"inactivityTimeMillisec", 20},
-            	} 
-            },            
+    		
+    		// pin number, {isPositional, speed, idlePulse, minPulse, maxPulse, inactivityTimeMillisec}
+            { 10, new Object[] { false, 2.0, 1470, 1440, 1500, 150} },
+            
+            // pin number, {isPositional, speed, idlePulse, minPulse, maxPulse, inactivityTimeMillisec}
+            { 11, new Object[] { false, 6.0, 1500, 1400, 1540, 50} },
+            
+            // pin number, {isPositional, speed, idlePulse, minPulse, maxPulse, inactivityTimeMillisec}
+            { 12, new Object[] {false, 500.0, 1500, 1200, 2500, 500} },
+            
+            // pin number, {isPositional, speed, idlePulse, minPulse, maxPulse, inactivityTimeMillisec}
+            { 13, new Object[] {false, 2.0, 1500, 1450, 1550, 150} },
+            
+            // pin number, {isPositional, speed, idlePulse, minPulse, maxPulse, inactivityTimeMillisec}
+            { 14, new Object[] { true, 0.05, 1500, 500, 2500, 150} },
+            
+            // pin number, {isPositional, speed, idlePulse, minPulse, maxPulse, inactivityTimeMillisec}
+            { 15, new Object[] { true, 50.0, 1500, 1000, 2500, 20} },            
     };
 }

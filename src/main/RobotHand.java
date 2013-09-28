@@ -3,6 +3,7 @@ package main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import configs.EnginesConfigsBundle;
 import configs.MainConfigsBundle;
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -11,6 +12,8 @@ public class RobotHand {
 	private static Logger logger = LogManager.getLogger("RobotHand");
 	 
 	private static final MainConfigsBundle mainConfigs = new MainConfigsBundle();
+	private static final EnginesConfigsBundle enginesConfigs = new EnginesConfigsBundle();
+	
 	private SerialPort serialPort;
 		
 	Engine[] engines;
@@ -33,14 +36,22 @@ public class RobotHand {
 	
 	public Engine[] initEngines() 
 	{
-		Engine[] engines = new Engine[6];
-		//Nustatymai Engine(RobotHand rh, int engineNo, boolean isPositional, double speed, int idlePulse, int minPulse, int maxPulse, long sleepTime)
-		engines[0] = new Engine(this, 0, false, 2, 1470, 1440, 1500, 150);
-		engines[1] = new Engine(this, 1, false, 6, 1500, 1400, 1540, 50);
-		engines[2] = new Engine(this, 2, false, 500, 1500, 1200, 2500, 500);
-		engines[3] = new Engine(this, 3, false, 2, 1500, 1450, 1550, 150);
-		engines[4] = new Engine(this, 4, true, 0.05, 1500, 500, 2500, 150);
-		engines[5] = new Engine(this, 5, true, 50, 1500, 1000, 2500, 20);
+		Engine[] engines = new Engine[enginesConfigs.keySet().size()];
+
+		Object[] pinConfigs = enginesConfigs.keySet().toArray();
+		for(int i = 0; i < engines.length; i++) {
+			Object[] engineConfigs = (Object[]) enginesConfigs.getObject((String) pinConfigs[i]);
+			engines[i] = new Engine(
+					this, // Robothand
+					Integer.parseInt( (String)pinConfigs[i]), // portNo 
+					Boolean.parseBoolean( (String)engineConfigs[0]), // isPositional
+					Double.parseDouble( (String) engineConfigs[1]), // speed
+					Integer.parseInt( (String)engineConfigs[2]), // idlePulse
+					Integer.parseInt( (String)engineConfigs[3]), // minPulse
+					Integer.parseInt( (String)engineConfigs[4]), // maxPulse
+					Integer.parseInt( (String)engineConfigs[5]) // inactivityTimeMillisec
+			);
+		}
 		for (Engine e: engines) {
 			e.start();
 		}
@@ -49,10 +60,10 @@ public class RobotHand {
 	
 	
 	
-	public synchronized void sendCommand(int engineNo, int p) 
+	public synchronized void sendCommand(int portNo, int p) 
 	{
-		log(engineNo, p);
-		String command = "#" + engineNo + "P" + p + "\r";
+		log(portNo, p);
+		String command = "#" + portNo + "P" + p + "\r";
 		try {
 			serialPort.writeBytes(command.getBytes());
 		} catch (SerialPortException e) {
