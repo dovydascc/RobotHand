@@ -3,6 +3,8 @@ package main;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -43,6 +45,7 @@ public class Main extends JPanel implements ActionListener
         JButton button = new JButton("Ájungti");
         main.add(button);
         button.addActionListener(main);
+        button.addKeyListener(new KeyListener());
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(frameSize);
@@ -66,8 +69,7 @@ public class Main extends JPanel implements ActionListener
 				System.exit(0);
 			}
 		});
-    }
-
+    }   
     
     
 	@Override
@@ -88,5 +90,18 @@ public class Main extends JPanel implements ActionListener
 	    	robotHand.shutdown();
 	    	isTurnOnPressed = false;
 		}
+	}
+	
+	static class KeyListener extends KeyAdapter {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_R) {
+            	robotHand.record();        	
+            }
+            
+            if (e.getKeyCode() == KeyEvent.VK_P) {
+            	robotHand.playback();             	
+            }
+        }
 	}
 }

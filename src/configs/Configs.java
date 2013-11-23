@@ -2,7 +2,7 @@ package configs;
 
 public class Configs {
 	// Roboto nustatymai
-	public static final Object[] robotConfigs = {"COM14", 115200, 8, 1, 0}; // port, baudrate, databits, stopbits, parityCheck
+	public static final Object[] robotConfigs = {"COM5", 115200, 8, 1, 0}; // port, baudrate, databits, stopbits, parityCheck
 	
 	// varikliø nustatymai
 	public static final Object[][] enginesConfigs = {
